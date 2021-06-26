@@ -18,7 +18,6 @@ namespace UniversidadeMacoratti.Models
         public int EstudanteID { get; set; }
         public Nota? Nota { get; set; }
         public Curso Curso { get; set; }
-        public Estudantes Estudante { get; set; }
-
+        public Estudante Estudante { get; set; }        
     }
 }

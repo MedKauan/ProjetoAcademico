@@ -4,7 +4,7 @@ using UniversidadeMacoratti.Models;
 
 namespace ProjetoEstudantesMacorrati.Models
 {
-    public class Estudantes
+    public class Estudante
     {
         public int EstudanteID { get; set; }
         public string SobreNome { get; set; }

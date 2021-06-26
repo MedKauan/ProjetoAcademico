@@ -6,7 +6,8 @@ namespace ProjetoEstudantesMacorrati.Models
 {
     public class Curso
     {
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        //DatabaseGeneratedOption.Identity) deixa auto increment sempre que a inclusão de registro na tabela de curso.
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int CursoID { get; set; }
         public string Titulo { get; set; }
         public int Creditos { get; set; }

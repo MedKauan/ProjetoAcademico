@@ -1,47 +1,58 @@
-﻿@model IEnumerable<ProjetoEstudantesMacorrati.Models.Estudante>
-
+﻿@model UniversidadeMacoratti.Models.Estudante
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Details";
 }
+<h2>Detalhes</h2>
 
-<h1>Index</h1>
-
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.SobreNome)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Nome)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.DataMatricula)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.SobreNome)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Nome)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.DataMatricula)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.EstudanteID">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.EstudanteID">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.EstudanteID">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+<div>
+    <h4>Estudante</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.SobreNome)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.SobreNome)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Nome)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Nome)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.DataMatricula)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.DataMatricula)
+        </dd>
+        <!--Exibe as matriculas do estudante -->
+        <dt>
+            @Html.DisplayNameFor(model => model.Matriculas)
+        </dt>
+        <dd>
+            <table class="table">
+                <tr>
+                    <th>Curso</th>
+                    <th>Nota</th>
+                </tr>
+                @foreach (var item in Model.Matriculas)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Curso.Titulo)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Nota)
+                        </td>
+                    </tr>
+                }
+            </table>
+        </dd>
+        <!-- fim -->
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.EstudanteID">Editar</a> |
+    <a asp-action="Index">Retorna para Lista</a>
+</div>

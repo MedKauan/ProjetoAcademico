@@ -33,8 +33,16 @@ namespace ProjetoEstudantesMacorrati.Controllers
                 return NotFound();
             }
 
+            //var estudante = await _context.Estudantes
+            //.SingleOrDefaultAsync(m => m.EstudanteID == id);
+
             var estudante = await _context.Estudantes
-                .FirstOrDefaultAsync(m => m.EstudanteID == id);
+                .Include(s => s.Matriculas)
+                .ThenInclude(e => e.Curso)
+                .AsNoTracking()
+                .SingleOrDefaultAsync(m => m.EstudanteID == id);
+
+
             if (estudante == null)
             {
                 return NotFound();
@@ -54,13 +62,23 @@ namespace ProjetoEstudantesMacorrati.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("EstudanteID,SobreNome,Nome,DataMatricula")] Estudante estudante)
+        public async Task<IActionResult> Create([Bind("SobreNome,Nome,DataMatricula")] Estudante estudante)
         {
-            if (ModelState.IsValid)
+            try
             {
-                _context.Add(estudante);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                if (ModelState.IsValid)
+                {
+                    _context.Add(estudante);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction("Index");
+                }
+            }
+            catch (DbUpdateException /* ex */)
+            {
+                //Logar o erro (descomente a variável ex e escreva um log
+                ModelState.AddModelError("", "Não foi possível salvar. " +
+                    "Tente novamente, e se o problema persistir " +
+                    "chame o suporte.");
             }
             return View(estudante);
         }
@@ -84,36 +102,34 @@ namespace ProjetoEstudantesMacorrati.Controllers
         // POST: Estudantes/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to, for 
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
+        [HttpPost, ActionName("Edit")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("EstudanteID,SobreNome,Nome,DataMatricula")] Estudante estudante)
+        public async Task<IActionResult> EditPost(int? id)
         {
-            if (id != estudante.EstudanteID)
+            if (id == null)
             {
                 return NotFound();
             }
-
-            if (ModelState.IsValid)
+            var atualizarEstudante = await _context.Estudantes.SingleOrDefaultAsync(s => s.EstudanteID == id);
+            if (await TryUpdateModelAsync<Estudante>(
+                atualizarEstudante,
+                "",
+                s => s.Nome, s => s.SobreNome, s => s.DataMatricula))
             {
                 try
                 {
-                    _context.Update(estudante);
                     await _context.SaveChangesAsync();
+                    return RedirectToAction("Index");
                 }
-                catch (DbUpdateConcurrencyException)
+                catch (DbUpdateException /* ex */)
                 {
-                    if (!EstudanteExists(estudante.EstudanteID))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    //Logar o erro (descomente a variável ex e escreva um log
+                    ModelState.AddModelError("", "Não foi possível salvar. " +
+                        "Tente novamente, e se o problema persistir " +
+                        "chame o suporte.");
                 }
-                return RedirectToAction(nameof(Index));
             }
-            return View(estudante);
+            return View(atualizarEstudante);
         }
 
         // GET: Estudantes/Delete/5
@@ -135,19 +151,27 @@ namespace ProjetoEstudantesMacorrati.Controllers
         }
 
         // POST: Estudantes/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> Delete(int? id, bool? saveChangesError = false)
         {
-            var estudante = await _context.Estudantes.FindAsync(id);
-            _context.Estudantes.Remove(estudante);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
+            if (id == null)
+            {
+                return NotFound();
+            }
+            var estudante = await _context.Estudantes
+                .AsNoTracking()
+                .SingleOrDefaultAsync(m => m.EstudanteID == id);
 
-        private bool EstudanteExists(int id)
-        {
-            return _context.Estudantes.Any(e => e.EstudanteID == id);
+            if (estudante == null)
+            {
+                return NotFound();
+            }
+            if (saveChangesError.GetValueOrDefault())
+            {
+                ViewData["ErrorMessage"] =
+                    "A exclusão falhou. Tente novamente e se o problema persistir " +
+                    "contate o suporte.";
+            }
+            return View(estudante);
         }
     }
 }

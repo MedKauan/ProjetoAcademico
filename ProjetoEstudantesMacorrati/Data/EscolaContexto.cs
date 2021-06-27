@@ -11,6 +11,7 @@ namespace ProjetoEstudantesMacorrati.Data
     {
         public EscolaContexto(DbContextOptions<EscolaContexto> options) : base(options)
         {
+            this.Database.EnsureCreated();
         }
 
         public DbSet<Curso> Cursos { get; set; }

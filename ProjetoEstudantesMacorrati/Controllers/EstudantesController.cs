@@ -16,13 +16,17 @@ namespace ProjetoEstudantesMacorrati.Controllers
 
         public EstudantesController(EscolaContexto context)
         {
-            _context = context;            
+            _context = context;
         }
 
         // GET: Estudantes
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Estudantes.ToListAsync());
+            var estudantes = new Estudante();
+            estudantes.ListagemEstudante = await _context.Estudantes.ToListAsync();
+            estudantes.TotalEstudantes = estudantes.ListagemEstudante.Count();
+
+            return View(estudantes);
         }
 
         // GET: Estudantes/Details/5
@@ -41,7 +45,6 @@ namespace ProjetoEstudantesMacorrati.Controllers
                 .ThenInclude(e => e.Curso)
                 .AsNoTracking()
                 .SingleOrDefaultAsync(m => m.EstudanteID == id);
-
 
             if (estudante == null)
             {
@@ -62,7 +65,7 @@ namespace ProjetoEstudantesMacorrati.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("SobreNome,Nome,DataMatricula")] Estudante estudante)
+        public async Task<IActionResult> Create(Estudante estudante)
         {
             try
             {
